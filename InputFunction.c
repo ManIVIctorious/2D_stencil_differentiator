@@ -18,11 +18,16 @@ int InputFunction(char *inputfile, double **q1, double **q2, double **V, int *nq
     char   buffer[_MaxLineLength_] = "";
     FILE *fd;
 
-    fd = fopen(inputfile, "r");
-    if(fd == NULL){
-        fprintf(stderr, "\n(-) ERROR opening input-file: \"%s\"", inputfile);
-        fprintf(stderr, "\n    Exiting...\n\n");
-        exit(1);
+    if(inputfile == NULL){
+        fprintf(stderr, "No input-file given, reading from stdin\n");
+        fd = stdin;
+    }else{
+        fd = fopen(inputfile, "r");
+        if(fd == NULL){
+            fprintf(stderr, "\n(-) ERROR opening input-file: \"%s\"", inputfile);
+            fprintf(stderr, "\n    Exiting...\n\n");
+            exit(1);
+        }
     }
 
     rows = 0;

@@ -1,6 +1,5 @@
 CC = gcc
 CFLAGS = -g -Wall -Wextra -Wmissing-prototypes -Wstrict-prototypes -Werror -Wno-sign-compare -mtune=native
-CFLAGS = -g
 
 EXE = bin/2D_differenciation
 OBJ = main.o InvertMatrix.o Factorial.o FiniteDifferenceCoefficients.o InputFunction.o

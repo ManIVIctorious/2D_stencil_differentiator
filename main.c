@@ -1,10 +1,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <getopt.h>
 
 
 int FiniteDifferenceCoefficients(unsigned int derivative, unsigned int point_number, int* point_location, double* result_vector);
 int InputFunction(char *inputfile, double **q1, double **q2, double **V, int *nq1, int *nq2);
+int Help(char *prog_name);
 
 int main(int argc, char* argv[]){
 
@@ -13,14 +15,14 @@ int main(int argc, char* argv[]){
 //-------------------------------------------------------------------------------------------
 
     int      i, j, k, l;
-    long int sx, sy;
     int      nx, ny, control;
-    double   dx, dy;
-    double   spacing_threshold = 1.0E-12; // abs(q[i] - q[i+1])
+    long int sx, sy;
+    double   dx, dy, spacing_threshold;
 
-    char   * endptr    = NULL;
-    char   * inputfile = NULL;
-    FILE   * fd        = NULL;
+    char   * endptr     = NULL;
+    char   * inputfile  = NULL;
+    char   * outputfile = NULL;
+    FILE   * fd         = NULL;
 
     int    * Location_x     = NULL; // freed
     int    * Location_y     = NULL; // freed
@@ -43,34 +45,86 @@ int main(int argc, char* argv[]){
 // Initialisation Initialisation Initialisation Initialisation Initialisation Initialisation
 //-------------------------------------------------------------------------------------------
     fd = stdout;
+    sx = 5;
+    sy = 5;
+    spacing_threshold = 1.0E-12; // abs(q[i] - q[i+1])
 
-    sx = strtol(argv[1], &endptr, 10);
-    if(endptr == argv[1]){
-        fprintf(stderr, "\n (-) Input Error:");
-        fprintf(stderr, "\n     Stencil x-dimension could not be converted to integer");
-        fprintf(stderr, "\n     Aborting...\n\n");
-        exit(1);
-    }
-    sy = strtol(argv[2], &endptr, 10);
-    if(endptr == argv[2]){
-        fprintf(stderr, "\n (-) Input Error:");
-        fprintf(stderr, "\n     Stencil y-dimension could not be converted to integer");
-        fprintf(stderr, "\n     Aborting...\n\n");
-        exit(1);
-    }
-    if(sx % 2 == 0 || sy % 2 == 0){
-        fprintf(stderr, "\n (-) Input Error:");
-        fprintf(stderr, "\n     Please use an odd number to specify the stencil size");
-        fprintf(stderr, "\n     Aborting...\n\n");
-        exit(1);
-    }
+    // optstring contains a list of all short option indices,
+    //  indices followed by a colon are options requiring an argument.
+    const char          * optstring = "x:y:i:o:t:h";
+    const struct option longopts[] = {
+    //  *name:      option name,
+    //  has_arg:    if option requires argument,
+    //  *flag:      if set to NULL getopt_long() returns val,
+    //              else it returns 0 and flag points to a variable set to val
+    //  val:        value to return
+        {"help",                  no_argument, NULL, 'h'},
+        {"xdim-stencil",    required_argument, NULL, 'x'},
+        {"ydim-stencil",    required_argument, NULL, 'y'},
+        {"input-file",      required_argument, NULL, 'i'},
+        {"output-file",     required_argument, NULL, 'o'},
+        {"threshold",       required_argument, NULL, 't'},
+    };
 
-    inputfile = argv[3];
-    if(inputfile == NULL){
-        fprintf(stderr, "\n (-) Input Error:");
-        fprintf(stderr, "\n     Please specify a valid input file");
-        fprintf(stderr, "\n     Aborting...\n\n");
-        exit(1);
+    optind = 1; // option index starting by 1
+    while(optind < argc){
+
+    // i is the integer representation of the corresponding option, e.g. x = 120
+    //  i = -1 corresponds to the end of the options
+        i = getopt_long(argc, argv, optstring, longopts, &j);
+
+    // iterate over options i
+        switch(i){
+            case 'x':
+                sx = strtol(optarg, &endptr, 10);
+                if(endptr == optarg){
+                    fprintf(stderr, "\n (-) Input Error:");
+                    fprintf(stderr, "\n     Stencil x-dimension could not be converted to integer");
+                    fprintf(stderr, "\n     Aborting...\n\n");
+                    exit(1);
+                }
+                if(sx % 2 == 0){
+                    fprintf(stderr, "\n (-) Input Error:");
+                    fprintf(stderr, "\n     Please use an odd number to specify the stencil size");
+                    fprintf(stderr, "\n     Aborting...\n\n");
+                    exit(1);
+                }
+                break;
+
+            case 'y':
+                sy = strtol(optarg, &endptr, 10);
+                if(endptr == optarg){
+                    fprintf(stderr, "\n (-) Input Error:");
+                    fprintf(stderr, "\n     Stencil y-dimension could not be converted to integer");
+                    fprintf(stderr, "\n     Aborting...\n\n");
+                    exit(1);
+                }
+                if(sy % 2 == 0){
+                    fprintf(stderr, "\n (-) Input Error:");
+                    fprintf(stderr, "\n     Please use an odd number to specify the stencil size");
+                    fprintf(stderr, "\n     Aborting...\n\n");
+                    exit(1);
+                }
+                break;
+
+            case 'i':
+                inputfile = optarg;
+                break;
+
+            case 'o':
+                outputfile = optarg;
+                break;
+
+            case 't':
+                spacing_threshold = atof(optarg);
+                break;
+
+            case 'h':
+                exit(Help(argv[0]));
+
+            default:
+                exit(Help(argv[0]));
+        }
     }
 
 //-------------------------------------------------------------------------------------------
@@ -135,7 +189,7 @@ int main(int argc, char* argv[]){
 // there must be at least as many data points as the stencil size
     if(nx <= sx || ny <= sy){
         fprintf(stderr, "\n (-) Error in reading data from input-file: \"%s\"", inputfile);
-        fprintf(stderr, "\n     Insufficient number of data points %dx%d for stencil size %dx%d.", nx, ny, sx, sy);
+        fprintf(stderr, "\n     Insufficient number of data points %dx%d for stencil size %ldx%ld.", nx, ny, sx, sy);
         fprintf(stderr, "\n     Aborting - please check your input...\n\n");
         exit(2);
     }
@@ -211,17 +265,18 @@ int main(int argc, char* argv[]){
         }
     }
 
-
 //-------------------------------------------------------------------------------------------
 //  Output   Output   Output   Output   Output   Output   Output   Output   Output   Output
 //-------------------------------------------------------------------------------------------
+    if(outputfile != NULL)  fd = fopen(outputfile, "w");
+
 // print stencils
-    fprintf(fd, "# Stencils for Hessian matrix with %dx%d points\n#", sx, sy);
+    fprintf(fd, "# Stencils for Hessian matrix with %ldx%ld points\n#", sx, sy);
 //  positions
     fprintf(fd, "\n# --==> Position map  (x,y) <==--\n#");
     for(i=0; i<sy; ++i){
         for(j=0; j<sx; ++j){
-            fprintf(fd, "\t(% d,% d)", j-(sy/2), i-(sx/2));
+            fprintf(fd, "\t(% ld,% ld)", j-(sy/2), i-(sx/2));
         }
         fprintf(fd, "\n#");
     }
@@ -266,7 +321,7 @@ int main(int argc, char* argv[]){
     for(i=0; i<sy; ++i){
         fprintf(fd, "\t% lf  |", first_deriv_y[i]);
         for(j=0; j<sx; ++j){
-            fprintf(fd, "\t% 4d",  sx*i + j);
+            fprintf(fd, "\t% 4ld",  sx*i + j);
             fprintf(fd, "\t% lf", xy_cross_deriv[sx*i + j]);
         }
         fprintf(fd, "\n#");
@@ -292,6 +347,7 @@ int main(int argc, char* argv[]){
         fprintf(fd, "\n");
     }
 
+    fclose(fd); fd = NULL;
 // free memory
     free(x); x = NULL;
     free(y); y = NULL;
@@ -299,6 +355,21 @@ int main(int argc, char* argv[]){
     free(d2dxdxV); d2dxdxV = NULL;
     free(d2dydyV); d2dydyV = NULL;
     free(d2dxdyV); d2dxdyV = NULL;
+
+    return 0;
+}
+
+int Help(char *prog_name){
+
+    printf("\nAvailable options for %s:\n", prog_name);
+
+    printf("\n\t"); printf("-h|--help               Show this help dialogue");
+    printf("\n\t"); printf("-x|--xdim-stencil       Set x-dimension of stencil");
+    printf("\n\t"); printf("-y|--ydim-stencil       Set y-dimension of stencil");
+    printf("\n\t"); printf("-i|--input-file         Input-file  to be used, if unset: reading from stdin");
+    printf("\n\t"); printf("-o|--output-file        Output-file to be used, if unset: writing to stdout");
+    printf("\n\t"); printf("-t|--threshold          Spacing threshold for the equi-spacing check");
+    printf("\n\n");
 
     return 0;
 }
