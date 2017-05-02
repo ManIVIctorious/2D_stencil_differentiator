@@ -15,11 +15,9 @@ int main(int argc, char* argv[]){
 //-------------------------------------------------------------------------------------------
 
     int      i, j, k, l;
-    int      nx, ny, control;
-    long int sx, sy;
+    int      nx, ny, sx, sy, control;
     double   dx, dy, spacing_threshold;
 
-    char   * endptr     = NULL;
     char   * inputfile  = NULL;
     char   * outputfile = NULL;
     FILE   * fd         = NULL;
@@ -76,13 +74,7 @@ int main(int argc, char* argv[]){
     // iterate over options i
         switch(i){
             case 'x':
-                sx = strtol(optarg, &endptr, 10);
-                if(endptr == optarg){
-                    fprintf(stderr, "\n (-) Input Error:");
-                    fprintf(stderr, "\n     Stencil x-dimension could not be converted to integer");
-                    fprintf(stderr, "\n     Aborting...\n\n");
-                    exit(1);
-                }
+                sx = atoi(optarg);
                 if(sx % 2 == 0){
                     fprintf(stderr, "\n (-) Input Error:");
                     fprintf(stderr, "\n     Please use an odd number to specify the stencil size");
@@ -92,13 +84,7 @@ int main(int argc, char* argv[]){
                 break;
 
             case 'y':
-                sy = strtol(optarg, &endptr, 10);
-                if(endptr == optarg){
-                    fprintf(stderr, "\n (-) Input Error:");
-                    fprintf(stderr, "\n     Stencil y-dimension could not be converted to integer");
-                    fprintf(stderr, "\n     Aborting...\n\n");
-                    exit(1);
-                }
+                sy = atoi(optarg);
                 if(sy % 2 == 0){
                     fprintf(stderr, "\n (-) Input Error:");
                     fprintf(stderr, "\n     Please use an odd number to specify the stencil size");
@@ -189,7 +175,7 @@ int main(int argc, char* argv[]){
 // there must be at least as many data points as the stencil size
     if(nx <= sx || ny <= sy){
         fprintf(stderr, "\n (-) Error in reading data from input-file: \"%s\"", inputfile);
-        fprintf(stderr, "\n     Insufficient number of data points %dx%d for stencil size %ldx%ld.", nx, ny, sx, sy);
+        fprintf(stderr, "\n     Insufficient number of data points %dx%d for stencil size %dx%d.", nx, ny, sx, sy);
         fprintf(stderr, "\n     Aborting - please check your input...\n\n");
         exit(2);
     }
@@ -271,12 +257,12 @@ int main(int argc, char* argv[]){
     if(outputfile != NULL)  fd = fopen(outputfile, "w");
 
 // print stencils
-    fprintf(fd, "# Stencils for Hessian matrix with %ldx%ld points\n#", sx, sy);
+    fprintf(fd, "# Stencils for Hessian matrix with %dx%d points\n#", sx, sy);
 //  positions
     fprintf(fd, "\n# --==> Position map  (x,y) <==--\n#");
     for(i=0; i<sy; ++i){
         for(j=0; j<sx; ++j){
-            fprintf(fd, "\t(% ld,% ld)", j-(sy/2), i-(sx/2));
+            fprintf(fd, "\t(% d,% d)", j-(sy/2), i-(sx/2));
         }
         fprintf(fd, "\n#");
     }
@@ -321,7 +307,7 @@ int main(int argc, char* argv[]){
     for(i=0; i<sy; ++i){
         fprintf(fd, "\t% lf  |", first_deriv_y[i]);
         for(j=0; j<sx; ++j){
-            fprintf(fd, "\t% 4ld",  sx*i + j);
+            fprintf(fd, "\t% 4d",  sx*i + j);
             fprintf(fd, "\t% lf", xy_cross_deriv[sx*i + j]);
         }
         fprintf(fd, "\n#");
