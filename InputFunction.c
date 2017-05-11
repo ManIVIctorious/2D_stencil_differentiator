@@ -58,12 +58,14 @@ int InputFunction(char *inputfile, double **q1, double **q2, double **V, int *nq
         //printf("%s\n", line);
 //-----------------------------------------------------------------------------------
 
-        if(strcasestr(line, "N") != NULL){
+        if((strncmp(line, "N", 1) == 0) && (isspace((int) line[1]) != 0)){
             control = sscanf(line, "%*s  %d  %d", &(*nq1), &(*nq2));
             if(control != 2){
                 fprintf(stderr, "\n(-) ERROR reading data from input-file \"%s\".", inputfile);
+                fprintf(stderr, "\n    Line containing point number information\n");
+                fprintf(stderr, "\n    does not provide appropriate information\n");
                 fprintf(stderr, "\n    Aborting - please check your input...\n\n");
-                exit(1);
+                exit(control);
             }
             continue;
         }
@@ -76,7 +78,7 @@ int InputFunction(char *inputfile, double **q1, double **q2, double **V, int *nq
         if(control != 3){
           fprintf(stderr, "\n(-) ERROR reading data from input-file \"%s\".", inputfile);
           fprintf(stderr, "\n    Aborting - please check your input...\n\n");
-          exit(1);
+          exit(control);
         }
 
         ++rows;

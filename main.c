@@ -17,6 +17,8 @@ int main(int argc, char* argv[]){
     int      i, j, k, l;
     int      nx, ny, sx, sy, control;
     double   dx, dy, spacing_threshold;
+    int      helpersx = 0;
+    int      helpersy = 0;
 
     char   * inputfile  = NULL;
     char   * outputfile = NULL;
@@ -45,7 +47,7 @@ int main(int argc, char* argv[]){
     fd = stdout;
     sx = 5;
     sy = 5;
-    spacing_threshold = 1.0E-12; // abs(q[i] - q[i+1])
+    spacing_threshold = 1.0E-10; // abs(q[i] - q[i+1])
 
     // optstring contains a list of all short option indices,
     //  indices followed by a colon are options requiring an argument.
@@ -81,6 +83,7 @@ int main(int argc, char* argv[]){
                     fprintf(stderr, "\n     Aborting...\n\n");
                     exit(1);
                 }
+                helpersx = 1;
                 break;
 
             case 'y':
@@ -91,6 +94,7 @@ int main(int argc, char* argv[]){
                     fprintf(stderr, "\n     Aborting...\n\n");
                     exit(1);
                 }
+                helpersy = 1;
                 break;
 
             case 'i':
@@ -112,6 +116,9 @@ int main(int argc, char* argv[]){
                 exit(Help(argv[0]));
         }
     }
+
+    if(helpersx == 0 && helpersy == 1)  sx = sy;
+    if(helpersy == 0 && helpersx == 1)  sy = sx;
 
 //-------------------------------------------------------------------------------------------
 //   Generate stencils    Generate stencils    Generate stencils    Generate stencils
@@ -323,7 +330,7 @@ int main(int argc, char* argv[]){
     fprintf(fd, "# nx = % 4d, ny = % 4d\n", nx, ny);
     for(i = 0; i < nx*ny; ++i){
         if(i % ny == 0) fprintf(fd, "\n");
-        fprintf(fd, "\t% 4d", i         );
+        //fprintf(fd, "\t% 4d", i         );
         fprintf(fd, "\t% lf", x[i]      );
         fprintf(fd, "\t% lf", y[i]      );
         fprintf(fd, "\t% lf", V[i]      );
