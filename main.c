@@ -278,8 +278,11 @@ int main(int argc, char* argv[]){
 //  stencil for d^2/dx^2
     fprintf(fd, "# --==> d^2/dx^2 <==--\n#");
     for(i = 0; i < sx; ++i){
-        fprintf(fd, "\t% 4d", i);
-        fprintf(fd, "\t% lf", second_deriv_x[i]);
+        fprintf(fd, "\t       % 4d       ", i);
+    }
+    fprintf(fd, "\n#");
+    for(i = 0; i < sx; ++i){
+        fprintf(fd, "\t% 15.12le", second_deriv_x[i]);
     }
     fprintf(fd, "\n#\n");
 
@@ -290,7 +293,7 @@ int main(int argc, char* argv[]){
     fprintf(fd, "# --==> d^2/dy^2 <==--\n#");
     for(i = 0; i < sy; ++i){
         fprintf(fd, "\t% 4d", i);
-        fprintf(fd, "\t% lf\n#", second_deriv_y[i]);
+        fprintf(fd, "\t% 15.12le\n#", second_deriv_y[i]);
     }
     fprintf(fd, "\n");
 
@@ -300,9 +303,9 @@ int main(int argc, char* argv[]){
 //  stencil for d^2/(dxdy)
     fprintf(fd, "# --==> d^2/(dxdy) <==--\n#");
 
-    fprintf(fd, "\td/dy / d/dx|");
+    fprintf(fd, "\t     d/dy / d/dx     |");
     for(j=0; j<sx; ++j){
-        fprintf(fd, "\t\t% lf", first_deriv_x[j]);
+        fprintf(fd, "\t% 15.12le", first_deriv_x[j]);
     }
     fprintf(fd, "\n#");
     fprintf(fd, "\t");
@@ -312,10 +315,10 @@ int main(int argc, char* argv[]){
     fprintf(fd, "\n#");
 
     for(i=0; i<sy; ++i){
-        fprintf(fd, "\t% lf  |", first_deriv_y[i]);
+        fprintf(fd, "\t% 15.12le  |", first_deriv_y[i]);
         for(j=0; j<sx; ++j){
-            fprintf(fd, "\t% 4d",  sx*i + j);
-            fprintf(fd, "\t% lf", xy_cross_deriv[sx*i + j]);
+//          fprintf(fd, "\t% 4d",  sx*i + j);
+            fprintf(fd, "\t% 15.12le", xy_cross_deriv[sx*i + j]);
         }
         fprintf(fd, "\n#");
     }
@@ -331,12 +334,12 @@ int main(int argc, char* argv[]){
     for(i = 0; i < nx*ny; ++i){
         if(i % ny == 0) fprintf(fd, "\n");
         //fprintf(fd, "\t% 4d", i         );
-        fprintf(fd, "\t% lf", x[i]      );
-        fprintf(fd, "\t% lf", y[i]      );
-        fprintf(fd, "\t% lf", V[i]      );
-        fprintf(fd, "\t% lf", d2dxdxV[i]);
-        fprintf(fd, "\t% lf", d2dydyV[i]);
-        fprintf(fd, "\t% lf", d2dxdyV[i]);
+        fprintf(fd, "\t% 20.14lf", x[i]      );
+        fprintf(fd, "\t% 20.14lf", y[i]      );
+        fprintf(fd, "\t% 20.14lf", V[i]      );
+        fprintf(fd, "\t% 20.14lf", d2dxdxV[i]);
+        fprintf(fd, "\t% 20.14lf", d2dydyV[i]);
+        fprintf(fd, "\t% 20.14lf", d2dxdyV[i]);
         fprintf(fd, "\n");
     }
 
