@@ -308,9 +308,9 @@ int main(int argc, char* argv[]){
         fprintf(fd, "\t% 15.12le", first_deriv_x[j]);
     }
     fprintf(fd, "\n#");
-    fprintf(fd, "\t");
+    fprintf(fd, "\t---------------------+");
     for(j=0; j<sx; ++j){
-        fprintf(fd, "--------------------------");
+        fprintf(fd, "------------------------");
     }
     fprintf(fd, "\n#");
 
