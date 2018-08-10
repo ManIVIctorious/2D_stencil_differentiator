@@ -22,7 +22,7 @@ int FiniteDifferenceCoefficients(unsigned int derivative, unsigned int point_num
 // result vector:   Array containing the desired finite difference coefficients
 int FiniteDifferenceCoefficients(unsigned int derivative, unsigned int point_number, int* point_location, double* result_vector){
 
-    int i, j;
+    unsigned int i, j;
     double     * constraint_vector;
     gsl_matrix *     coefficient_matrix;
     gsl_matrix * inv_coefficient_matrix;

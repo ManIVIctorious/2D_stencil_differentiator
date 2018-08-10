@@ -36,7 +36,7 @@ int InputFunction(char *inputfile, double **q1, double **q2, double **V, int *nq
         // check if the first character in buffer is a comment char,
         //  if yes jump to next line
         comment_flag = 0;
-        for(i=0; i<strlen(comment); ++i){
+        for(i=0; i<(int)strlen(comment); ++i){
             if(buffer[0] == comment[i]){
                 comment_flag = 1;
                 break;
