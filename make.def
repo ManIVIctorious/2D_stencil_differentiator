@@ -1,0 +1,17 @@
+# Executable name
+  EXENAME = 2d-stencil-differentiator
+
+# Additional libraries, includes and packages
+  LIB      = -lm
+  INC      = 
+  PACKAGES = gsl
+
+# Preprocessor flags
+  PPF = 
+
+# Source Files
+  SRC += main.c
+  SRC += Factorial.c
+  SRC += FiniteDifferenceCoefficients.c
+  SRC += InputFunction.c
+  SRC += InvertMatrix.c
